@@ -49,7 +49,7 @@ phase.set_time_options(fix_initial=True, fix_duration=True, duration_val=s_final
 # Define states
 phase.add_state('t', fix_initial=True, fix_final=False, units='s', lower=0,
                 rate_source='dt_ds', ref=100)  # time
-phase.add_state('E', fix_initial=False, fix_final=False, units='J',rate_source='dE_ds', ref=100000000)  # Energy
+phase.add_state('E', fix_initial=True, fix_final=False, units='J',rate_source='dE_ds', ref=100000000)  # Energy
 phase.add_state('n', fix_initial=False, fix_final=False, units='m', upper=4.0, lower=-4.0,
                 rate_source='dn_ds', targets=['n'],
                 ref=4.0)  # normal distance to centerline. The bounds on n define the
@@ -97,9 +97,9 @@ phase.add_parameter('M', val=1900.0, units='kg', opt=False,
                     static_target=True)  # vehicle mass
 phase.add_parameter('beta', val=0.62, units=None, opt=False, targets=['tire.beta'],
                     static_target=True)  # brake bias
-phase.add_parameter('mu0_y', val=1, units=None, opt=False, targets=['tireconstraint.mu0_y'],
+phase.add_parameter('mu0_y', val=1.5, units=None, opt=False, targets=['tireconstraint.mu0_y'],
                     static_target=True)  # lateral friction coefficient
-phase.add_parameter('mu0_x', val=1, units=None, opt=False, targets=['tireconstraint.mu0_x'],
+phase.add_parameter('mu0_x', val=1.5, units=None, opt=False, targets=['tireconstraint.mu0_x'],
                     static_target=True)  # longitudinal friction coefficient
 phase.add_parameter('CoP', val=1.6, units='m', opt=False, targets=['normal.CoP'],
                     static_target=True)  # center of pressure location
@@ -175,7 +175,7 @@ dm.run_problem(p, run_driver=True)
 n = p.get_val('traj.phase0.timeseries.states:n')
 s = p.get_val('traj.phase0.timeseries.s')
 V = p.get_val('traj.phase0.timeseries.states:V')
-E = p.get_val('traj.phase0.timeseries.states:E')/3600000
+E = p.get_val('traj.phase0.timeseries.states:E')
 time = p.get_val('traj.phase0.timeseries.states:t')
 thrust = p.get_val('traj.phase0.timeseries.controls:thrust')
 delta = p.get_val('traj.phase0.timeseries.controls:delta')
@@ -270,8 +270,8 @@ def plot_track_with_data(state, s):
 
     if np.array_equal(state, V[:, 0]):
         clb.set_label('Velocity (m/s)')
-    elif np.array_equal(state, thrust[:, 0]):
-        clb.set_label('Thrust')
+    elif np.array_equal(state, E[:, 0]):
+        clb.set_label('Energy')
     elif np.array_equal(state, delta[:, 0]):
         clb.set_label('Delta')
 
@@ -281,8 +281,6 @@ def plot_track_with_data(state, s):
 # Create the plots
 plot_track_with_data(V, s)
 plot_track_with_data(E, s)
-plot_track_with_data(thrust, s)
-plot_track_with_data(delta, s)
 
 # Plot the main vehicle telemetry vs distance
 fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(15, 8))
@@ -382,7 +380,7 @@ axes.plot(s,
           p.get_val('traj.phase0.timeseries.c_rr', units=None), label='c_rr')
 
 axes.plot(s, power / pmax, label='Power')
-
+axes.plot(s, E / 3600000, label='E')
 axes.legend(bbox_to_anchor=(1.04, 0.5), loc="center left")
 axes.set_xlabel('s (m)')
 axes.set_ylabel('Performance constraints')
