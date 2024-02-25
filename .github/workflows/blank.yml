@@ -15,19 +15,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    container:
-      image: continuumio/miniconda3:latest
-      options: --user root
-      
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: anaconda-client-env
+          auto-update-conda: true
+          activate-environment: dymos
           environment-file: environment.yml
           python-version: 3.8
           auto-activate-base: false
+          miniconda-version: "latest"
       - run: |
           conda info
           conda list
