@@ -13,25 +13,37 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  test:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
+      name: Check out repository code
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: python ./brachistochrone.py
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8' # Specify the Python version you need
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          ls
-          cat .gitignore
-          
+    - name: Set up Conda
+      run: |
+        echo "Setting up Conda."
+        minicondaPath=$HOME/miniconda
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
+        bash $HOME/miniconda.sh -b -u -p $minicondaPath
+        source $minicondaPath/etc/profile.d/conda.sh
+        hash -r
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        # Useful for debugging any issues with conda
+        conda info -a
+
+    - name: Create and activate Conda environment
+      run: |
+        conda env create -f environment.yml
+        source activate dymos
+        
+    - name: Run tests
+      run: |
+        # Command to run your tests, e.g., pytest for Python tests
+        python ./brachistochrone.py
