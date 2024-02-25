@@ -24,6 +24,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
+          auto-update-conda: true
           activate-environment: dymos
           environment-file: environment.yml
           python-version: 3.8
