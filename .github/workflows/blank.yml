@@ -13,22 +13,21 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 jobs:
-  build:
+  execute-python-script:
     runs-on: ubuntu-latest
-    
-    container:
-      image: continuumio/miniconda3:latest
-      options: --user root
-      
     steps:
     - uses: actions/checkout@v2
+      name: Check out repository code
 
-    - name: Setup Environment
-      run: |
-        conda env create -f environment.yml
-        conda activate dymos
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8' # Specify the Python version you need
 
-    - name: Run Tests
+    - name: Install Python dependencies
       run: |
-        # Your test commands go here
-        python ./brachistochrone.py
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run script
+      run: python brachistochrone.py
