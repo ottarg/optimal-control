@@ -12,38 +12,23 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+    
+    container:
+      image: continuumio/miniconda3:latest
+      options: --user root
+      
     steps:
     - uses: actions/checkout@v2
-      name: Check out repository code
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8' # Specify the Python version you need
-
-    - name: Set up Conda
-      run: |
-        echo "Setting up Conda."
-        minicondaPath=$HOME/miniconda
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
-        bash $HOME/miniconda.sh -b -u -p $minicondaPath
-        source $minicondaPath/etc/profile.d/conda.sh
-        hash -r
-        conda config --set always_yes yes --set changeps1 no
-        conda update -q conda
-        # Useful for debugging any issues with conda
-        conda info -a
-
-    - name: Create and activate Conda environment
+    - name: Setup Environment
       run: |
         conda env create -f environment.yml
-        source activate dymos
-        
-    - name: Run tests
+        conda activate dymos
+
+    - name: Run Tests
       run: |
-        # Command to run your tests, e.g., pytest for Python tests
+        # Your test commands go here
         python ./brachistochrone.py
