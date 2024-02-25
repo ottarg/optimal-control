@@ -13,18 +13,21 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  example-3:
+    name: Ex3 Linux
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        shell: bash -el {0}
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
+          miniconda-version: "latest"
           activate-environment: dymos
           environment-file: environment.yml
           python-version: 3.8
           auto-activate-base: false
-          miniconda-version: "latest"
       - run: |
           conda info
           conda list
