@@ -1,2 +1,2 @@
 # optimal-control
-Dymos optiml control project
+Dymos optimal control project
